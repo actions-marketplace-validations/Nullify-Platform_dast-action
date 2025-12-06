@@ -1,9 +1,40 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "timezone": "Australia/Sydney",
   "docker": {
     "pinDigests": true
   },
-  "extends": [
-    "config:base"
+  "packageRules": [
+    {
+      "groupName": "Dependencies",
+      "groupSlug": "dependencies",
+      "matchUpdateTypes": ["major", "minor", "patch", "digest", "pin", "pinDigest", "lockFileMaintenance"],
+      "matchPackagePatterns": ["*"],
+      "schedule": ["before 9am on monday"],
+      "labels": ["no-release"]
+    },
+    {
+      "groupName": "CLI (Patch)",
+      "groupSlug": "cli",
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "matchDepNames": ["github.com/nullify-platform/cli"],
+      "schedule": ["every 1 hour after 6am and before 8pm every weekday"],
+      "labels": ["patch"]
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^action\\.yml$",
+        "^README\\.md$"
+      ],
+      "matchStrings": [
+        "nullify-version:\\n    description:.*\\n    required: false\\n    default: \"(?<currentValue>.*?)\"",
+        "\\| nullify-version.*\\|.*\\|.*\\| (?<currentValue>.*?) "
+      ],
+      "depNameTemplate": "github.com/nullify-platform/cli",
+      "datasourceTemplate": "go"
+    }
   ]
 }

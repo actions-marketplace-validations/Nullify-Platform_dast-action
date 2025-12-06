@@ -1,0 +1,32 @@
+name: Build, Test and Format
+on:
+  pull_request:
+env:
+  NULLIFY_VERSION: 0.0.0
+  NULLIFY_ARCH: linux_amd64  # New environment variable
+jobs:
+  build:
+    name: Build, Test and Format
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install Nullify CLI
+        run: |
+          download_url="https://github.com/Nullify-Platform/cli/releases/download/v${{ env.NULLIFY_VERSION }}/nullify_${{ env.NULLIFY_ARCH }}_${{ env.NULLIFY_VERSION }}"
+          wget -q $download_url -O nullify
+          chmod +x nullify
+      - name: Test Nullify CLI
+        run: |
+          ./nullify -d
+      - name: Format README
+        run: |
+          npm install -g markdown-table-formatter
+          markdown-table-formatter README.md
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          file_pattern: README.md
+          commit_message: update readme
